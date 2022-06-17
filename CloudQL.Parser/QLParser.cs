@@ -29,6 +29,12 @@ namespace CloudQL.QLParser
         public Resource? Child { get; set; }
     }
 
+    public class Query
+    {
+        public Keywords Keyword { get; set; }
+
+    }
+
     public static class QueryLanguage
     {
 
@@ -46,5 +52,10 @@ namespace CloudQL.QLParser
         public static readonly Parser<char, Resource> Resource = from ident in Identifier
                                                                  from child in Rec(() => Dot.Then(Resource)).Optional()
                                                                  select new Resource() { Name = ident, Child = child.GetValueOrDefault(() => null) };
+
+        public static readonly Parser<char, Query> Query = from fromKeyword in From
+                                                           from whereClause in Where
+                                                           from selectExpr in Select
+                                                           select new Query() { }
     }
 }
