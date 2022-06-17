@@ -173,15 +173,16 @@ namespace CloudQL.QLParser
         public static readonly Parser<char, Expression> Expression = Boolean;
 
         public static readonly Parser<char, Filter> Where = from whereKeyword in String("where")
-                                                            from expr in Expression
+                                                            from expr in SkipWhitespaces.Then(Expression)
                                                             select new WhereFilter() { Expression = expr } as Filter;
 
         public static readonly Parser<char, IEnumerable<Filter>> Filters = OneOf(Where).AtLeastOnce();
 
 
         public static readonly Parser<char, Query> Query = from fromKeyword in From
-                                                           from filters in Filters.Optional()
-                                                           from selectExpr in Select
+                                                           from resource in SkipWhitespaces.Then(Resource)
+                                                           from filters in SkipWhitespaces.Then(Filters.Optional())
+                                                           from selectExpr in SkipWhitespaces.Then(Select)
                                                            select new Query() { };
     }
 }

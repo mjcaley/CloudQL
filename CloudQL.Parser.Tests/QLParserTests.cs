@@ -96,7 +96,7 @@ namespace CloudQL.Parser.Tests
         [Fact]
         public void ParsesQuery()
         {
-            var result = QueryLanguage.Expression.ParseOrThrow("from azure.vm where name and something");
+            var result = QueryLanguage.Query.ParseOrThrow("from azure.vm where name == 42 select");
 
             Assert.NotNull(result);
         }
