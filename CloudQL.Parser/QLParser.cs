@@ -76,6 +76,13 @@ namespace CloudQL.QLParser
         public Expression Right { get; set; }
     }
 
+    public class ComparisonExpression : Expression
+    {
+        public ComparisonOperator Operator { get; set; }
+        public Expression Left { get; set; }
+        public Expression Right { get; set; }
+    }
+
     public class UnaryExpression : Expression
     {
         public UnaryOperator Operator { get; set; }
@@ -103,7 +110,19 @@ namespace CloudQL.QLParser
         public static readonly Parser<char, BooleanOperator> And = String("and").ThenReturn(BooleanOperator.And);
         public static readonly Parser<char, BooleanOperator> Or = String("or").ThenReturn(BooleanOperator.Or);
         public static readonly Parser<char, UnaryOperator> Not = String("not").ThenReturn(UnaryOperator.Not);
-
+        public static readonly Parser<char, ComparisonOperator> Equal = from _ in String("==")
+                                                                        select ComparisonOperator.Equal;
+        public static readonly Parser<char, ComparisonOperator> NotEqual = from _ in String("!=")
+                                                                           select ComparisonOperator.NotEqual;
+        public static readonly Parser<char, ComparisonOperator> LessThan = from _ in String("<")
+                                                                           select ComparisonOperator.LessThan;
+        public static readonly Parser<char, ComparisonOperator> GreaterThan = from _ in String(">")
+                                                                              select ComparisonOperator.GreaterThan;
+        public static readonly Parser<char, ComparisonOperator> LessThanOrEqual = from _ in String("<=")
+                                                                                  select ComparisonOperator.LessThanOrEqual;
+        public static readonly Parser<char, ComparisonOperator> GreaterThanOrEqual = from _ in String(">=")
+                                                                                     select ComparisonOperator.GreaterThanOrEqual;
+         
         public static readonly Parser<char, Operators> Dot = Char('.').ThenReturn(Operators.Dot);
         public static readonly Parser<char, Operators> Comma = Char(',').ThenReturn(Operators.Comma);
 
@@ -133,14 +152,23 @@ namespace CloudQL.QLParser
                                                                         select new UnaryExpression() { Operator = notOp, Right = expr } as Expression
                                                                     ),
                                                                     Atom);
+        public static readonly Parser<char, Expression> Comparison = OneOf(
+                                                                        Try(
+                                                                            from leftExpr in Unary
+                                                                            from compOp in SkipWhitespaces.Then(OneOf(Try(Equal), Try(NotEqual), Try(LessThanOrEqual), Try(GreaterThanOrEqual), Try(LessThan), Try(GreaterThan)))
+                                                                            from rightExpr in SkipWhitespaces.Then(Expression)
+                                                                            select new ComparisonExpression() { Operator = compOp, Left = leftExpr, Right = rightExpr } as Expression
+                                                                        ),
+                                                                        Unary
+                                                                        );
         public static readonly Parser<char, Expression> Boolean = OneOf(
                                                                     Try(
-                                                                        from leftExpr in OneOf(Unary, Atom)
+                                                                        from leftExpr in Comparison
                                                                         from boolOp in SkipWhitespaces.Then(OneOf(And, Or))
                                                                         from rightExpr in SkipWhitespaces.Then(Expression)
                                                                         select new BooleanExpression() { Left = leftExpr, Operator = boolOp, Right = rightExpr } as Expression
                                                                     ),
-                                                                    Unary
+                                                                    Comparison
                                                                 );
         public static readonly Parser<char, Expression> Expression = Boolean;
 

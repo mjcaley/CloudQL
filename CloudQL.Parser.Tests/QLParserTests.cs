@@ -75,5 +75,30 @@ namespace CloudQL.Parser.Tests
             var right = expr.Right as IntegerExpression;
             Assert.Equal(24, right.Integer);
         }
+
+        [Theory]
+        [InlineData("==", ComparisonOperator.Equal)]
+        [InlineData("!=", ComparisonOperator.NotEqual)]
+        [InlineData(">", ComparisonOperator.GreaterThan)]
+        [InlineData("<", ComparisonOperator.LessThan)]
+        [InlineData(">=", ComparisonOperator.GreaterThanOrEqual)]
+        [InlineData("<=", ComparisonOperator.LessThanOrEqual)]
+        public void ParsesComparisonExpression(string testInput, ComparisonOperator expected)
+        {
+            var result = QueryLanguage.Expression.ParseOrThrow($"42 {testInput} 24");
+
+            var expr = Assert.IsType<ComparisonExpression>(result);
+            Assert.Equal(expected, expr.Operator);
+            Assert.IsType<IntegerExpression>(expr.Left);
+            Assert.IsType<IntegerExpression>(expr.Right);
+        }
+
+        [Fact]
+        public void ParsesQuery()
+        {
+            var result = QueryLanguage.Expression.ParseOrThrow("from azure.vm where name and something");
+
+            Assert.NotNull(result);
+        }
     }
 }
