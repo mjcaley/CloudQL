@@ -58,6 +58,22 @@ namespace CloudQL.Parser.Tests
             var result = QueryLanguage.Expression.ParseOrThrow("not ident");
 
             var expr = Assert.IsType<UnaryExpression>(result);
+            Assert.Equal(UnaryOperator.Not, expr.Operator);
+        }
+
+        [Theory]
+        [InlineData("and", BooleanOperator.And)]
+        [InlineData("or", BooleanOperator.Or)]
+        public void ParsesBooleanExpression(string testInput, BooleanOperator expected)
+        {
+            var result = QueryLanguage.Expression.ParseOrThrow($"42 {testInput} 24");
+
+            var expr = Assert.IsType<BooleanExpression>(result);
+            Assert.Equal(expected, expr.Operator);
+            var left = expr.Left as IntegerExpression;
+            Assert.Equal(42, left.Integer);
+            var right = expr.Right as IntegerExpression;
+            Assert.Equal(24, right.Integer);
         }
     }
 }

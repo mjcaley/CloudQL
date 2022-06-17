@@ -31,14 +31,20 @@ namespace CloudQL.QLParser
         public Resource? Child { get; set; }
     }
 
-    public enum BinaryOperator
+    public enum BooleanOperator
+    {
+        And,
+        Or,
+    }
+
+    public enum ComparisonOperator
     {
         Equal,
         NotEqual,
         GreaterThan,
         LessThan,
-        And,
-        Or,
+        GreaterThanOrEqual,
+        LessThanOrEqual,
     }
 
     public enum UnaryOperator
@@ -63,9 +69,9 @@ namespace CloudQL.QLParser
         public string Identifier { get; set; }
     }
 
-    public class BinaryExpression : Expression
+    public class BooleanExpression : Expression
     {
-        public BinaryOperator Operator { get; set; }
+        public BooleanOperator Operator { get; set; }
         public Expression Left { get; set; }
         public Expression Right { get; set; }
     }
@@ -94,9 +100,8 @@ namespace CloudQL.QLParser
 
         public static readonly Parser<char, Keywords> Select = String("select").ThenReturn(Keywords.Select);
         public static readonly Parser<char, Keywords> From = String("from").ThenReturn(Keywords.From);
-        //public static readonly Parser<char, Keywords> Where = String("where").ThenReturn(Keywords.Where);
-        public static readonly Parser<char, BinaryOperator> And = String("and").ThenReturn(BinaryOperator.And);
-        public static readonly Parser<char, BinaryOperator> Or = String("or").ThenReturn(BinaryOperator.Or);
+        public static readonly Parser<char, BooleanOperator> And = String("and").ThenReturn(BooleanOperator.And);
+        public static readonly Parser<char, BooleanOperator> Or = String("or").ThenReturn(BooleanOperator.Or);
         public static readonly Parser<char, UnaryOperator> Not = String("not").ThenReturn(UnaryOperator.Not);
 
         public static readonly Parser<char, Operators> Dot = Char('.').ThenReturn(Operators.Dot);
@@ -128,16 +133,16 @@ namespace CloudQL.QLParser
                                                                         select new UnaryExpression() { Operator = notOp, Right = expr } as Expression
                                                                     ),
                                                                     Atom);
-        public static readonly Parser<char, Expression> Binary = OneOf(
+        public static readonly Parser<char, Expression> Boolean = OneOf(
                                                                     Try(
                                                                         from leftExpr in OneOf(Unary, Atom)
-                                                                        from binOp in SkipWhitespaces.Then(OneOf(And, Or))
+                                                                        from boolOp in SkipWhitespaces.Then(OneOf(And, Or))
                                                                         from rightExpr in SkipWhitespaces.Then(Expression)
-                                                                        select new BinaryExpression() { Left = leftExpr, Operator = binOp, Right = rightExpr } as Expression
+                                                                        select new BooleanExpression() { Left = leftExpr, Operator = boolOp, Right = rightExpr } as Expression
                                                                     ),
                                                                     Unary
                                                                 );
-        public static readonly Parser<char, Expression> Expression = Binary;
+        public static readonly Parser<char, Expression> Expression = Boolean;
 
         public static readonly Parser<char, Filter> Where = from whereKeyword in String("where")
                                                             from expr in Expression
