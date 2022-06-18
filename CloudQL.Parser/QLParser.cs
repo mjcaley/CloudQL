@@ -129,10 +129,6 @@ namespace CloudQL.QLParser
         public static readonly Parser<char, string> Identifier = from first in Letter
                                                                  from rest in OneOf(LetterOrDigit, Char('_')).ManyString()
                                                                  select first + rest;
-        public static readonly Parser<char, double> Float = from first in Digit.AtLeastOnceString()
-                                                            from dot in Char('.')
-                                                            from second in Digit.AtLeastOnceString()
-                                                            select double.Parse(first + dot + second, System.Globalization.CultureInfo.InvariantCulture);
 
         public static readonly Parser<char, Resource> Resource = from ident in Identifier
                                                                  from child in Rec(() => Dot.Then(Resource)).Optional()
@@ -140,9 +136,9 @@ namespace CloudQL.QLParser
 
         public static readonly Parser<char, Expression> IdentifierAtom = from ident in Identifier
                                                                          select new IdentifierExpression() { Identifier = ident } as Expression;
-        public static readonly Parser<char, Expression> IntegerAtom = from integer in Digit.ManyString().Map(digits => long.Parse(digits))
+        public static readonly Parser<char, Expression> IntegerAtom = from integer in LongNum
                                                                       select new IntegerExpression() { Integer = integer } as Expression;
-        public static readonly Parser<char, Expression> FloatAtom = from floatAtom in Float
+        public static readonly Parser<char, Expression> FloatAtom = from floatAtom in Real
                                                                     select new FloatExpression() { Float = floatAtom } as Expression;
         public static readonly Parser<char, Expression> Atom = OneOf(IdentifierAtom, Try(FloatAtom), Try(IntegerAtom));
         public static readonly Parser<char, Expression> Unary = OneOf(
