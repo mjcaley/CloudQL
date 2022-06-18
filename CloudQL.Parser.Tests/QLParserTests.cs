@@ -113,7 +113,7 @@ namespace CloudQL.Parser.Tests
         [Fact]
         public void ParsesSelectClauseOneColumn()
         {
-            var result = QueryLanguage.SelectClause.ParseOrThrow("select one");
+            var result = QueryLanguage.Filter.ParseOrThrow("select one");
 
             var select = Assert.IsType<SelectFilter>(result);
             Assert.Equal(new[] { "one" }, select.Columns);
@@ -122,7 +122,7 @@ namespace CloudQL.Parser.Tests
         [Fact]
         public void ParsesSelectClauseMultipleColumns()
         {
-            var result = QueryLanguage.SelectClause.ParseOrThrow("select one,two,three");
+            var result = QueryLanguage.Filter.ParseOrThrow("select one,two,three");
 
             var select = Assert.IsType<SelectFilter>(result);
             Assert.Equal(new[] { "one", "two", "three" }, select.Columns);
@@ -132,7 +132,7 @@ namespace CloudQL.Parser.Tests
         [Fact]
         public void ParsesWhereClause()
         {
-            var result = QueryLanguage.WhereClause.ParseOrThrow("where 1 == 1");
+            var result = QueryLanguage.Filter.ParseOrThrow("where 1 == 1");
 
             var where = Assert.IsType<WhereFilter>(result);
             Assert.NotNull(where.Expression);

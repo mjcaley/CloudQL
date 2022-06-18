@@ -218,11 +218,11 @@ namespace CloudQL.QLParser
                                                                    from columns in Identifier.Separated(Comma)
                                                                    select new SelectFilter() { Columns = columns } as Filter;
 
-        public static readonly Parser<char, IEnumerable<Filter>> Filters = OneOf(SelectClause, WhereClause).Many();
+        public static readonly Parser<char, Filter> Filter = OneOf(SelectClause, WhereClause);
 
         public static readonly Parser<char, Query> Query = from fromKeyword in Tok("from")
                                                            from resource in Tok(Resource)
-                                                           from filters in Filters
+                                                           from filters in Filter.Many()
                                                            select new Query() { Resource = resource, Filters = filters };
     }
 }
