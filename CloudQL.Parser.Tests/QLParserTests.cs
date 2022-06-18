@@ -12,7 +12,7 @@ namespace CloudQL.Parser.Tests
 
             Assert.Equal("azure", result.Name);
             Assert.NotNull(result.Child);
-            Assert.Equal("vm", result.Child.Name);
+            Assert.Equal("vm", result.Child!.Name);
             Assert.Null(result.Child.Child);
         }
 
@@ -79,9 +79,9 @@ namespace CloudQL.Parser.Tests
 
             var expr = Assert.IsType<BooleanExpression>(result);
             Assert.Equal(expected, expr.Operator);
-            var left = expr.Left as IntegerExpression;
+            var left = Assert.IsType<IntegerExpression>(expr.Left);
             Assert.Equal(42, left.Integer);
-            var right = expr.Right as IntegerExpression;
+            var right = Assert.IsType<IntegerExpression>(expr.Right);
             Assert.Equal(24, right.Integer);
         }
 
@@ -141,7 +141,7 @@ namespace CloudQL.Parser.Tests
         [Fact]
         public void ParsesQuery()
         {
-            var result = QueryLanguage.Query.ParseOrThrow("from azure.vm where name == 42 select");
+            var result = QueryLanguage.Query.ParseOrThrow("from azure.vm where name == 42 select name");
 
             Assert.NotNull(result);
         }
