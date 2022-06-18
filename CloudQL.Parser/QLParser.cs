@@ -1,131 +1,9 @@
 ﻿using Pidgin;
 using static Pidgin.Parser;
 using static Pidgin.Parser<char>;
-using static Pidgin.Parser<char, char>;
 
 namespace CloudQL.QLParser
 {
-    public class Node
-    {
-
-    }
-
-    public enum Keywords
-    {
-        Select,
-        From,
-        Where,
-        Group,
-        Order,
-    }
-
-    public enum Operators
-    {
-        Dot,
-        Comma,
-    }
-
-    public class Resource
-    {
-        public string Name { get; set; } = string.Empty;
-        public Resource? Child { get; set; }
-    }
-
-    public enum BooleanOperator
-    {
-        And,
-        Or,
-    }
-
-    public enum ComparisonOperator
-    {
-        Equal,
-        NotEqual,
-        GreaterThan,
-        LessThan,
-        GreaterThanOrEqual,
-        LessThanOrEqual,
-    }
-
-    public enum UnaryOperator
-    {
-        Not,
-        Negative,
-        Positive,
-    }
-
-    public abstract class Expression { }
-
-    public class IntegerExpression : Expression
-    {
-        public long Integer { get; set; }
-    }
-
-    public class FloatExpression : Expression
-    {
-        public double Float { get; set; }
-    }
-
-    public class IdentifierExpression : Expression
-    {
-        public string Identifier { get; set; }
-    }
-
-    public class StringExpression : Expression
-    {
-        public string Value { get; set; }
-    }
-
-    public class BooleanExpression : Expression
-    {
-        public BooleanOperator Operator { get; set; }
-        public Expression Left { get; set; }
-        public Expression Right { get; set; }
-    }
-
-    public class ComparisonExpression : Expression
-    {
-        public ComparisonOperator Operator { get; set; }
-        public Expression Left { get; set; }
-        public Expression Right { get; set; }
-    }
-
-    public class UnaryExpression : Expression
-    {
-        public UnaryOperator Operator { get; set; }
-        public Expression Right { get; set; }
-    }
-
-    public abstract class Filter { }
-
-    public class SelectFilter : Filter
-    {
-        public IEnumerable<string> Columns { get; set; }
-    }
-
-    public enum SortOrder
-    {
-        Ascending,
-        Descending,
-    }
-
-    public class SortFilter : Filter
-    {
-        public SortOrder Direction { get; set; } = SortOrder.Ascending;
-        public IEnumerable<string> Columns { get; set; }
-    }
-
-    public class WhereFilter : Filter
-    {
-        public Expression Expression { get; set; }
-    }
-
-    public class Query
-    {
-        public Resource Resource { get; set; }
-        public IEnumerable<Filter> Filters { get; set; }
-    }
-
     public static class QueryLanguage
     {
         private static Parser<char, T> Tok<T>(Parser<char, T> token) => Try(token).Before(SkipWhitespaces);
@@ -156,8 +34,8 @@ namespace CloudQL.QLParser
             Try(Equal), Try(NotEqual), Try(GreaterThanOrEqual), Try(LessThanOrEqual), Try(GreaterThan), Try(LessThan)
             );
          
-        public static readonly Parser<char, Operators> Dot = Tok(".").ThenReturn(Operators.Dot);
-        public static readonly Parser<char, Operators> Comma = Tok(",").ThenReturn(Operators.Comma);
+        public static readonly Parser<char, string> Dot = Tok(".");
+        public static readonly Parser<char, string> Comma = Tok(",");
 
         public static readonly Parser<char, string> Identifier = from first in Letter
                                                                  from rest in OneOf(LetterOrDigit, Char('_')).ManyString()
