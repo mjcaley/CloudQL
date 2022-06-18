@@ -110,8 +110,8 @@ namespace CloudQL.QLParser
 
     public class Query
     {
-        public Keywords Keyword { get; set; }
-
+        public Resource Resource { get; set; }
+        public IEnumerable<Filter> Filters { get; set; }
     }
 
     public static class QueryLanguage
@@ -223,6 +223,6 @@ namespace CloudQL.QLParser
         public static readonly Parser<char, Query> Query = from fromKeyword in Tok("from")
                                                            from resource in Tok(Resource)
                                                            from filters in Filters
-                                                           select new Query() { };
+                                                           select new Query() { Resource = resource, Filters = filters };
     }
 }
