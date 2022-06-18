@@ -50,6 +50,8 @@ namespace CloudQL.QLParser
     public enum UnaryOperator
     {
         Not,
+        Negative,
+        Positive,
     }
 
     public abstract class Expression { }
@@ -108,21 +110,31 @@ namespace CloudQL.QLParser
         private static Parser<char, string> Tok(string token) => Tok(String(token));
 
         public static readonly Parser<char, Keywords> From = Tok("from").ThenReturn(Keywords.From);
-        public static readonly Parser<char, BooleanOperator> And = Tok("and").ThenReturn(BooleanOperator.And);
-        public static readonly Parser<char, BooleanOperator> Or = Tok("or").ThenReturn(BooleanOperator.Or);
-        public static readonly Parser<char, UnaryOperator> Not = Tok("not").ThenReturn(UnaryOperator.Not);
-        public static readonly Parser<char, ComparisonOperator> Equal = from _ in Tok("==")
+        
+        private static readonly Parser<char, BooleanOperator> And = Tok("and").ThenReturn(BooleanOperator.And);
+        private static readonly Parser<char, BooleanOperator> Or = Tok("or").ThenReturn(BooleanOperator.Or);
+        public static readonly Parser<char, BooleanOperator> BoolOps = OneOf(And, Or);
+
+        private static readonly Parser<char, UnaryOperator> Not = Tok("not").ThenReturn(UnaryOperator.Not);
+        private static readonly Parser<char, UnaryOperator> Neg = Tok("-").ThenReturn(UnaryOperator.Negative);
+        private static readonly Parser<char, UnaryOperator> Pos = Tok("+").ThenReturn(UnaryOperator.Positive);
+        public static readonly Parser<char, UnaryOperator> UnaryOps = OneOf(Not, Neg, Pos);
+
+        private static readonly Parser<char, ComparisonOperator> Equal = from _ in Tok("==")
                                                                         select ComparisonOperator.Equal;
-        public static readonly Parser<char, ComparisonOperator> NotEqual = from _ in Tok("!=")
+        private static readonly Parser<char, ComparisonOperator> NotEqual = from _ in Tok("!=")
                                                                            select ComparisonOperator.NotEqual;
-        public static readonly Parser<char, ComparisonOperator> LessThan = from _ in Tok("<")
+        private static readonly Parser<char, ComparisonOperator> LessThan = from _ in Tok("<")
                                                                            select ComparisonOperator.LessThan;
-        public static readonly Parser<char, ComparisonOperator> GreaterThan = from _ in Tok(">")
+        private static readonly Parser<char, ComparisonOperator> GreaterThan = from _ in Tok(">")
                                                                               select ComparisonOperator.GreaterThan;
-        public static readonly Parser<char, ComparisonOperator> LessThanOrEqual = from _ in Tok("<=")
+        private static readonly Parser<char, ComparisonOperator> LessThanOrEqual = from _ in Tok("<=")
                                                                                   select ComparisonOperator.LessThanOrEqual;
-        public static readonly Parser<char, ComparisonOperator> GreaterThanOrEqual = from _ in Tok(">=")
+        private static readonly Parser<char, ComparisonOperator> GreaterThanOrEqual = from _ in Tok(">=")
                                                                                      select ComparisonOperator.GreaterThanOrEqual;
+        public static readonly Parser<char, ComparisonOperator> CompOps = OneOf(
+            Try(Equal), Try(NotEqual), Try(GreaterThanOrEqual), Try(LessThanOrEqual), Try(GreaterThan), Try(LessThan)
+            );
          
         public static readonly Parser<char, Operators> Dot = Tok(".").ThenReturn(Operators.Dot);
         public static readonly Parser<char, Operators> Comma = Tok(",").ThenReturn(Operators.Comma);
@@ -163,15 +175,15 @@ namespace CloudQL.QLParser
         public static readonly Parser<char, Expression> Atom = OneOf(IdentifierAtom, Try(FloatAtom), Try(IntegerAtom));
         public static readonly Parser<char, Expression> Unary = OneOf(
                                                                     Try(
-                                                                        from notOp in Not
+                                                                        from unaryOp in UnaryOps
                                                                         from expr in Tok(Expression)
-                                                                        select new UnaryExpression() { Operator = notOp, Right = expr } as Expression
+                                                                        select new UnaryExpression() { Operator = unaryOp, Right = expr } as Expression
                                                                     ),
                                                                     Atom);
         public static readonly Parser<char, Expression> Comparison = OneOf(
                                                                         Try(
                                                                             from leftExpr in Unary
-                                                                            from compOp in OneOf(Try(Equal), Try(NotEqual), Try(LessThanOrEqual), Try(GreaterThanOrEqual), Try(LessThan), Try(GreaterThan))
+                                                                            from compOp in CompOps
                                                                             from rightExpr in Tok(Expression)
                                                                             select new ComparisonExpression() { Operator = compOp, Left = leftExpr, Right = rightExpr } as Expression
                                                                         ),
@@ -180,7 +192,7 @@ namespace CloudQL.QLParser
         public static readonly Parser<char, Expression> Boolean = OneOf(
                                                                     Try(
                                                                         from leftExpr in Comparison
-                                                                        from boolOp in OneOf(And, Or)
+                                                                        from boolOp in BoolOps
                                                                         from rightExpr in Tok(Expression)
                                                                         select new BooleanExpression() { Left = leftExpr, Operator = boolOp, Right = rightExpr } as Expression
                                                                     ),
