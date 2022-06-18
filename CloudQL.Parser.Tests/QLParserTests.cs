@@ -128,6 +128,32 @@ namespace CloudQL.Parser.Tests
             Assert.Equal(new[] { "one", "two", "three" }, select.Columns);
         }
 
+        [Theory]
+        [InlineData("asc", SortOrder.Ascending)]
+        [InlineData("desc", SortOrder.Descending)]
+        [InlineData("", SortOrder.Ascending)]
+        public void ParsesSortClauseOneColumn(string testInput, SortOrder expected)
+        {
+            var result = QueryLanguage.Filter.ParseOrThrow($"sort {testInput} one");
+
+            var filter = Assert.IsType<SortFilter>(result);
+            Assert.Equal(expected, filter.Direction);
+            Assert.Equal(new[] { "one" }, filter.Columns);
+        }
+
+        [Theory]
+        [InlineData("asc", SortOrder.Ascending)]
+        [InlineData("desc", SortOrder.Descending)]
+        [InlineData("", SortOrder.Ascending)]
+        public void ParsesSortClauseMultipleColumns(string testInput, SortOrder expected)
+        {
+            var result = QueryLanguage.Filter.ParseOrThrow($"sort {testInput} one, two, three");
+
+            var filter = Assert.IsType<SortFilter>(result);
+            Assert.Equal(expected, filter.Direction);
+            Assert.Equal(new[] { "one", "two", "three" }, filter.Columns);
+        }
+
 
         [Fact]
         public void ParsesWhereClause()

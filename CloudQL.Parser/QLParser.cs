@@ -103,6 +103,18 @@ namespace CloudQL.QLParser
         public IEnumerable<string> Columns { get; set; }
     }
 
+    public enum SortOrder
+    {
+        Ascending,
+        Descending,
+    }
+
+    public class SortFilter : Filter
+    {
+        public SortOrder Direction { get; set; } = SortOrder.Ascending;
+        public IEnumerable<string> Columns { get; set; }
+    }
+
     public class WhereFilter : Filter
     {
         public Expression Expression { get; set; }
@@ -210,15 +222,33 @@ namespace CloudQL.QLParser
                                                                 );
         public static readonly Parser<char, Expression> Expression = Boolean;
 
-        public static readonly Parser<char, Filter> WhereClause = from whereKeyword in Tok("where")
-                                                                  from expr in Tok(Expression)
-                                                                  select new WhereFilter() { Expression = expr } as Filter;
-
-        public static readonly Parser<char, Filter> SelectClause = from selectKeyword in Tok("select")
+        public static readonly Parser<char, Filter> SelectClause = from keyword in Tok("select")
                                                                    from columns in Identifier.Separated(Comma)
                                                                    select new SelectFilter() { Columns = columns } as Filter;
 
-        public static readonly Parser<char, Filter> Filter = OneOf(SelectClause, WhereClause);
+        public static readonly Parser<char, Filter> SortClause = from keyword in Tok("sort")
+                                                                 from direction in OneOf(Tok("asc"), Tok("desc")).Optional().Map(s =>
+                                                                 {
+                                                                     if (s.HasValue)
+                                                                     {
+                                                                         return s.Value switch
+                                                                         {
+                                                                             "asc" => SortOrder.Ascending,
+                                                                             "desc" => SortOrder.Descending,
+                                                                             _ => SortOrder.Ascending,
+                                                                         };
+                                                                     }
+
+                                                                     return SortOrder.Ascending;
+                                                                 })
+                                                                 from columns in Identifier.Separated(Comma)
+                                                                 select new SortFilter() { Columns = columns, Direction = direction } as Filter;
+
+        public static readonly Parser<char, Filter> WhereClause = from keyword in Tok("where")
+                                                                  from expr in Tok(Expression)
+                                                                  select new WhereFilter() { Expression = expr } as Filter;
+
+        public static readonly Parser<char, Filter> Filter = OneOf(SelectClause, SortClause, WhereClause);
 
         public static readonly Parser<char, Query> Query = from fromKeyword in Tok("from")
                                                            from resource in Tok(Resource)
