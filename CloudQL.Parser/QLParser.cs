@@ -71,6 +71,11 @@ namespace CloudQL.QLParser
         public string Identifier { get; set; }
     }
 
+    public class StringExpression : Expression
+    {
+        public string Value { get; set; }
+    }
+
     public class BooleanExpression : Expression
     {
         public BooleanOperator Operator { get; set; }
@@ -93,6 +98,11 @@ namespace CloudQL.QLParser
 
     public abstract class Filter { }
 
+    public class SelectFilter : Filter
+    {
+        public IEnumerable<string> Columns { get; set; }
+    }
+
     public class WhereFilter : Filter
     {
         public Expression Expression { get; set; }
@@ -108,8 +118,6 @@ namespace CloudQL.QLParser
     {
         private static Parser<char, T> Tok<T>(Parser<char, T> token) => Try(token).Before(SkipWhitespaces);
         private static Parser<char, string> Tok(string token) => Tok(String(token));
-
-        public static readonly Parser<char, Keywords> From = Tok("from").ThenReturn(Keywords.From);
         
         private static readonly Parser<char, BooleanOperator> And = Tok("and").ThenReturn(BooleanOperator.And);
         private static readonly Parser<char, BooleanOperator> Or = Tok("or").ThenReturn(BooleanOperator.Or);
@@ -151,6 +159,8 @@ namespace CloudQL.QLParser
                                                                          select new IdentifierExpression() { Identifier = ident } as Expression;
         public static readonly Parser<char, Expression> IntegerAtom = from integer in Tok(LongNum)
                                                                       select new IntegerExpression() { Integer = integer } as Expression;
+        public static readonly Parser<char, Expression> StringAtom =
+            AnyCharExcept('"').ManyString().Between(Char('"')).Map(s => new StringExpression() { Value = s } as Expression);
 
         private static readonly Parser<char, string> FloatFirst = OneOf(
             String("0"),
@@ -172,7 +182,7 @@ namespace CloudQL.QLParser
                                                                    
         public static readonly Parser<char, Expression> FloatAtom = from floatAtom in Tok(FloatLiteral)
                                                                     select new FloatExpression() { Float = floatAtom } as Expression;
-        public static readonly Parser<char, Expression> Atom = OneOf(IdentifierAtom, Try(FloatAtom), Try(IntegerAtom));
+        public static readonly Parser<char, Expression> Atom = OneOf(IdentifierAtom, Try(FloatAtom), Try(IntegerAtom), StringAtom);
         public static readonly Parser<char, Expression> Unary = OneOf(
                                                                     Try(
                                                                         from unaryOp in UnaryOps
@@ -200,20 +210,19 @@ namespace CloudQL.QLParser
                                                                 );
         public static readonly Parser<char, Expression> Expression = Boolean;
 
-        public static readonly Parser<char, Filter> Where = from whereKeyword in Tok("where")
-                                                            from expr in Tok(Expression)
-                                                            select new WhereFilter() { Expression = expr } as Filter;
+        public static readonly Parser<char, Filter> WhereClause = from whereKeyword in Tok("where")
+                                                                  from expr in Tok(Expression)
+                                                                  select new WhereFilter() { Expression = expr } as Filter;
 
-        //public static readonly Parser<char, Filter> Select = from selectKeyword in Tok("select")
-        //                                                     from 
+        public static readonly Parser<char, Filter> SelectClause = from selectKeyword in Tok("select")
+                                                                   from columns in Identifier.Separated(Comma)
+                                                                   select new SelectFilter() { Columns = columns } as Filter;
 
-        public static readonly Parser<char, IEnumerable<Filter>> Filters = OneOf(Where).AtLeastOnce();
+        public static readonly Parser<char, IEnumerable<Filter>> Filters = OneOf(SelectClause, WhereClause).Many();
 
-
-        public static readonly Parser<char, Query> Query = from fromKeyword in From
+        public static readonly Parser<char, Query> Query = from fromKeyword in Tok("from")
                                                            from resource in Tok(Resource)
-                                                           from filters in Tok(Filters.Optional())
-                                                           from selectExpr in Tok("select")
+                                                           from filters in Filters
                                                            select new Query() { };
     }
 }

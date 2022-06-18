@@ -61,6 +61,15 @@ namespace CloudQL.Parser.Tests
             Assert.Equal(UnaryOperator.Not, expr.Operator);
         }
 
+        [Fact]
+        public void ParsesStringExpression()
+        {
+            var result = QueryLanguage.Expression.ParseOrThrow(@"""A string value""");
+
+            var expr = Assert.IsType<StringExpression>(result);
+            Assert.Equal("A string value", expr.Value);
+        }
+
         [Theory]
         [InlineData("and", BooleanOperator.And)]
         [InlineData("or", BooleanOperator.Or)]
@@ -91,6 +100,42 @@ namespace CloudQL.Parser.Tests
             Assert.Equal(expected, expr.Operator);
             Assert.IsType<IntegerExpression>(expr.Left);
             Assert.IsType<IntegerExpression>(expr.Right);
+        }
+
+        [Fact]
+        public void ParsesComplexExpression()
+        {
+            var result = QueryLanguage.Expression.ParseOrThrow("one == 1 and not 2.2");
+
+            Assert.NotNull(result);
+        }
+
+        [Fact]
+        public void ParsesSelectClauseOneColumn()
+        {
+            var result = QueryLanguage.SelectClause.ParseOrThrow("select one");
+
+            var select = Assert.IsType<SelectFilter>(result);
+            Assert.Equal(new[] { "one" }, select.Columns);
+        }
+
+        [Fact]
+        public void ParsesSelectClauseMultipleColumns()
+        {
+            var result = QueryLanguage.SelectClause.ParseOrThrow("select one,two,three");
+
+            var select = Assert.IsType<SelectFilter>(result);
+            Assert.Equal(new[] { "one", "two", "three" }, select.Columns);
+        }
+
+
+        [Fact]
+        public void ParsesWhereClause()
+        {
+            var result = QueryLanguage.WhereClause.ParseOrThrow("where 1 == 1");
+
+            var where = Assert.IsType<WhereFilter>(result);
+            Assert.NotNull(where.Expression);
         }
 
         [Fact]
