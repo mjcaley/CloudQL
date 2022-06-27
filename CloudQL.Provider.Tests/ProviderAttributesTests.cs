@@ -1,3 +1,5 @@
+using CloudQL.TestCloud;
+
 namespace CloudQL.Provider.Tests
 {
     public class ProviderAttributesTests
@@ -5,20 +7,19 @@ namespace CloudQL.Provider.Tests
         [Fact]
         public void ProviderAttributeReturnsAssembly()
         {
-            var assembly = ResourceResolver.GetProvider("test");
+            var provider = ResourceResolver.GetProvider("test");
 
-            Assert.NotNull(assembly);
-            Assert.Equal("CloudQL.TestProvider", assembly?.GetName().Name);
+            Assert.NotNull(provider);
+            Assert.IsType<TestProvider>(provider);
         }
 
         [Fact]
         public void ResourceAttributeReturns()
         {
-            var assembly = ResourceResolver.GetProvider("test");
-            var resoureClient = ResourceResolver.GetResourceClient(assembly, new[] { "vm" });
+            var resoureClient = ResourceResolver.GetResourceClient("test.resource");
 
             Assert.NotNull(resoureClient);
-
+            Assert.IsType<TestResource>(resoureClient);
         }
     }
 }

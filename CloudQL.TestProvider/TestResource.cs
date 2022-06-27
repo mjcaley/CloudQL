@@ -1,8 +1,9 @@
 ﻿using CloudQL.Provider;
 
-namespace CloudQL.Azure
+namespace CloudQL.TestCloud
 {
-    public class AzureResourceClient : IResourceClient
+    [ResourceClient("test", "resource")]
+    public class TestResource : IResourceClient
     {
         public void Get()
         {

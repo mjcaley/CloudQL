@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
@@ -23,7 +23,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\CloudQL.Provider\CloudQL.Provider.csproj" />
-    <ProjectReference Include="..\CloudQL.TestProvider\CloudQL.TestProvider.csproj" />
+    <ProjectReference Include="..\CloudQL.TestProvider\ClouldQL.TestCloud.csproj" />
   </ItemGroup>
 
 </Project>

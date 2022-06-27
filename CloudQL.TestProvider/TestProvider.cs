@@ -1,11 +1,11 @@
 ﻿using CloudQL.Provider;
 
-namespace CloudQL.TestProvider
+namespace CloudQL.TestCloud
 {
     [Provider("test")]
     public class TestProvider : ICloudProvider
     {
-        public IResourceClient GetResourceClient(IEnumerable<string> resource)
+        public void Initialize()
         {
             throw new NotImplementedException();
         }

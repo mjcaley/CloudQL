@@ -17,7 +17,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CloudQL.Provider", "CloudQL
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CloudQL.Provider.Tests", "CloudQL.Provider.Tests\CloudQL.Provider.Tests.csproj", "{8DF54EA9-0D76-4857-A5CE-C27A64D23C1D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CloudQL.TestProvider", "CloudQL.TestProvider\CloudQL.TestProvider.csproj", "{E7696116-08E2-4AAE-8979-F935F4FCE64A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClouldQL.TestCloud", "CloudQL.TestProvider\ClouldQL.TestCloud.csproj", "{E7696116-08E2-4AAE-8979-F935F4FCE64A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -3,8 +3,8 @@
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]
     public class ResourceClientAttribute : Attribute
     {
-        public ResourceClientAttribute(string resource) => Resource = resource;
+        public ResourceClientAttribute(params string[] resource) => Resource = resource;
 
-        public string Resource { get; private set; }
+        public string[] Resource { get; private set; }
     }
 }

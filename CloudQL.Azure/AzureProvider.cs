@@ -4,7 +4,7 @@ namespace CloudQL.Azure
 {
     public class AzureProvider : ICloudProvider
     {
-        public IResourceClient GetResourceClient(IEnumerable<string> resource)
+        public void Initialize()
         {
             throw new NotImplementedException();
         }

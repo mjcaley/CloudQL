@@ -1,5 +1,4 @@
 ﻿using CloudQL.Provider;
-using System.Linq;
 using System.Reflection;
 
 namespace CloudQL

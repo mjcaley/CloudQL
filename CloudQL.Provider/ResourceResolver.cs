@@ -4,8 +4,8 @@ namespace CloudQL.Provider
 {
     public static class ResourceResolver
     {
-        private static Dictionary<string, ICloudProvider> _providers = new();
-        private static Dictionary<string, IResourceClient> _resourceClients = new();
+        private static Dictionary<string, Type> _providers = new();
+        private static Dictionary<string, Type> _resourceClients = new();
 
         static ResourceResolver()
         {
@@ -13,44 +13,47 @@ namespace CloudQL.Provider
             {
                 foreach (var type in assembly.GetTypes())
                 {
-                    var providerAttribute = type.GetCustomAttribute<ProviderAttribute>()
-                    if (providerAttribute != null)
+                    var providerAttribute = type.GetCustomAttribute<ProviderAttribute>();
+                    if (providerAttribute != null
+                        && type.IsAssignableTo(typeof(ICloudProvider)))
                     {
-                        _providers.Add(providerAttribute.Provider, (ICloudProvider)type);
+                        _providers.Add(providerAttribute.Provider, type);
+                    }
+
+                    var resourceClientAttribute = type.GetCustomAttribute<ResourceClientAttribute>();
+                    if (resourceClientAttribute != null
+                        && type.IsAssignableTo(typeof(IResourceClient)))
+                    {
+                        _resourceClients.Add(string.Join('.', resourceClientAttribute.Resource), type);
                     }
                 }
             }
         }
 
-        public static Assembly? GetProvider(string name)
+        public static ICloudProvider? GetProvider(string name)
         {
-            var assemblies = AppDomain.CurrentDomain.GetAssemblies();
-            foreach (var assembly in assemblies)
+            var providerType = _providers.GetValueOrDefault(name, null);
+            if (providerType == null)
             {
-                var attribute = (ProviderAttribute?)assembly.GetCustomAttribute(typeof(ProviderAttribute));
-                if (attribute?.Provider == name)
-                {
-                    return assembly;
-                }
+                return null;
             }
 
-            return null;
+            var provider = (ICloudProvider)Activator.CreateInstance(providerType);
+
+            return provider;
         }
 
-        public static IResourceClient? GetResourceClient(Assembly assembly, IEnumerable<string> resource)
+        public static IResourceClient? GetResourceClient(string resource)
         {
-            var types = assembly.GetTypes();
-            foreach (var type in types)
+            var resourceType = _resourceClients.GetValueOrDefault(resource, null);
+            if (resourceType == null)
             {
-                var attributes = (ResourceClientAttribute[])type.GetCustomAttributes(typeof(ResourceClientAttribute), false);
-                var resourceAttributes = attributes.Select(a => a.Resource);
-                if (resource == resourceAttributes && type is IResourceClient)
-                {
-                    return type! as IResourceClient;
-                }
+                return null;
             }
 
-            return null;
+            var resourceClient = (IResourceClient)Activator.CreateInstance(resourceType);
+
+            return resourceClient;
         }
     }
 }
