@@ -6,23 +6,12 @@ namespace CloudQL.Parser.Tests
     public class QLParserTests
     {
         [Fact]
-        public void ParsesResourceRecursive()
+        public void ParsesResources()
         {
             var result = QueryLanguage.Resource.ParseOrThrow("azure.vm");
 
-            Assert.Equal("azure", result.Name);
-            Assert.NotNull(result.Child);
-            Assert.Equal("vm", result.Child!.Name);
-            Assert.Null(result.Child.Child);
-        }
-
-        [Fact]
-        public void ParsesResourceLeaf()
-        {
-            var result = QueryLanguage.Resource.ParseOrThrow("azure");
-
-            Assert.Equal("azure", result.Name);
-            Assert.Null(result.Child);
+            Assert.Equal("azure", result.Names[0]);
+            Assert.Equal("vm", result.Names[1]);
         }
 
         [Fact]

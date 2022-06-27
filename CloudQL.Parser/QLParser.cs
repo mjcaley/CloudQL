@@ -41,9 +41,8 @@ namespace CloudQL.QLParser
                                                                  from rest in OneOf(LetterOrDigit, Char('_')).ManyString()
                                                                  select first + rest;
 
-        public static readonly Parser<char, Resource> Resource = from ident in Identifier
-                                                                 from child in Rec(() => Dot.Then(Resource)).Optional()
-                                                                 select new Resource() { Name = ident, Child = child.GetValueOrDefault(() => null) };
+        public static readonly Parser<char, Resource> Resource = from idents in Identifier.Separated(Dot)
+                                                                 select new Resource() { Names = idents.ToList() };
 
         public static readonly Parser<char, Expression> IdentifierAtom = from ident in Tok(Identifier)
                                                                          select new IdentifierExpression() { Identifier = ident } as Expression;
