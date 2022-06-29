@@ -1,6 +1,6 @@
 using CloudQL.TestCloud;
 
-namespace CloudQL.Provider.Tests
+namespace CloudQL.Engine.Tests
 {
     public class ProviderAttributesTests
     {

@@ -1,4 +1,4 @@
-﻿namespace CloudQL.Provider
+﻿namespace CloudQL.Engine
 {
     public interface ICloudProvider
     {

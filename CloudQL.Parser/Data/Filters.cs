@@ -1,4 +1,4 @@
-﻿namespace CloudQL.QLParser
+﻿namespace CloudQL.QLParser.Data
 {
     public abstract class Filter { }
 

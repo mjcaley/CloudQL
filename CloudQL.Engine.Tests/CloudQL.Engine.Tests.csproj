@@ -22,8 +22,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\CloudQL.Provider\CloudQL.Provider.csproj" />
-    <ProjectReference Include="..\CloudQL.TestProvider\ClouldQL.TestCloud.csproj" />
+    <ProjectReference Include="..\CloudQL.Engine\CloudQL.Engine.csproj" />
+    <ProjectReference Include="..\CloudQL.TestCloud\ClouldQL.TestCloud.csproj" />
   </ItemGroup>
 
 </Project>

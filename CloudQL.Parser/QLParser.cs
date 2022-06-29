@@ -1,4 +1,5 @@
-﻿using Pidgin;
+﻿using CloudQL.QLParser.Data;
+using Pidgin;
 using static Pidgin.Parser;
 using static Pidgin.Parser<char>;
 
@@ -101,7 +102,7 @@ namespace CloudQL.QLParser
         public static readonly Parser<char, Expression> Expression = Boolean;
 
         public static readonly Parser<char, Filter> SelectClause = from keyword in Tok("select")
-                                                                   from columns in Identifier.Separated(Comma)
+                                                                   from columns in Tok(Identifier).Separated(Comma)
                                                                    select new SelectFilter() { Columns = columns } as Filter;
 
         public static readonly Parser<char, Filter> SortClause = from keyword in Tok("sort")
@@ -119,7 +120,7 @@ namespace CloudQL.QLParser
 
                                                                      return SortOrder.Ascending;
                                                                  })
-                                                                 from columns in Identifier.Separated(Comma)
+                                                                 from columns in Tok(Identifier).Separated(Comma)
                                                                  select new SortFilter() { Columns = columns, Direction = direction } as Filter;
 
         public static readonly Parser<char, Filter> WhereClause = from keyword in Tok("where")
@@ -132,5 +133,12 @@ namespace CloudQL.QLParser
                                                            from resource in Tok(Resource)
                                                            from filters in Filter.Many()
                                                            select new Query() { Resource = resource, Filters = filters };
+
+        public static readonly Parser<char, Assignment> Assignment = from letKeyword in Tok("let")
+                                                                     from ident in Tok(Identifier)
+                                                                     from equalOp in Tok("=")
+                                                                     from query in Query
+                                                                     from semicolon in Tok(";")
+                                                                     select new Assignment() { Identifier = ident, Query = query };
     }
 }

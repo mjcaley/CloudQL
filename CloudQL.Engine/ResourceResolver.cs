@@ -1,6 +1,6 @@
 ﻿using System.Reflection;
 
-namespace CloudQL.Provider
+namespace CloudQL.Engine
 {
     public static class ResourceResolver
     {

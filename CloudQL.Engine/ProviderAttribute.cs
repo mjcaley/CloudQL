@@ -1,4 +1,4 @@
-﻿namespace CloudQL.Provider
+﻿namespace CloudQL.Engine
 {
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct)]
     public class ProviderAttribute : Attribute

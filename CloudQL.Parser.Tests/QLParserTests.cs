@@ -1,7 +1,7 @@
-using CloudQL.QLParser;
+using CloudQL.QLParser.Data;
 using Pidgin;
 
-namespace CloudQL.Parser.Tests
+namespace CloudQL.QLParser.Tests
 {
     public class QLParserTests
     {
@@ -170,6 +170,16 @@ namespace CloudQL.Parser.Tests
             var result = QueryLanguage.Query.ParseOrThrow("from azure.vm where name == 42 select name");
 
             Assert.NotNull(result);
+        }
+
+        [Fact]
+        public void ParsesAssignment()
+        {
+            var result = QueryLanguage.Assignment.ParseOrThrow("var ident = from azure.vm select name");
+
+            Assert.NotNull(result);
+            Assert.Equal("ident", result.Identifier);
+            Assert.NotNull(result.Query);
         }
     }
 }

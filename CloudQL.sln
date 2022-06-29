@@ -13,11 +13,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CloudQL.Azure", "CloudQL.Az
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CloudQL.Azure.Tests", "CloudQL.Azure.Tests\CloudQL.Azure.Tests.csproj", "{700EDAD4-2C8E-40A2-9CB7-C762A245330A}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CloudQL.Provider", "CloudQL.Provider\CloudQL.Provider.csproj", "{7E468E13-9AA4-4D52-A8D1-7BBF4F020EDE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CloudQL.Engine", "CloudQL.Engine\CloudQL.Engine.csproj", "{7E468E13-9AA4-4D52-A8D1-7BBF4F020EDE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CloudQL.Provider.Tests", "CloudQL.Provider.Tests\CloudQL.Provider.Tests.csproj", "{8DF54EA9-0D76-4857-A5CE-C27A64D23C1D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CloudQL.Engine.Tests", "CloudQL.Engine.Tests\CloudQL.Engine.Tests.csproj", "{8DF54EA9-0D76-4857-A5CE-C27A64D23C1D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClouldQL.TestCloud", "CloudQL.TestProvider\ClouldQL.TestCloud.csproj", "{E7696116-08E2-4AAE-8979-F935F4FCE64A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClouldQL.TestCloud", "CloudQL.TestCloud\ClouldQL.TestCloud.csproj", "{E7696116-08E2-4AAE-8979-F935F4FCE64A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

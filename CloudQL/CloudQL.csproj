@@ -8,7 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\CloudQL.Provider\CloudQL.Provider.csproj" />
+    <ProjectReference Include="..\CloudQL.Engine\CloudQL.Engine.csproj" />
   </ItemGroup>
 
 </Project>
