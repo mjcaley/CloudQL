@@ -164,7 +164,7 @@ namespace CloudQL.QLParser.Tests
         [Fact]
         public void ParsesAssignment()
         {
-            var result = QueryLanguage.Assignment.ParseOrThrow("var ident = from azure.vm select name");
+            var result = QueryLanguage.Assignment.ParseOrThrow("let ident = from azure.vm select name;");
 
             Assert.NotNull(result);
             Assert.Equal("ident", result.Identifier);
